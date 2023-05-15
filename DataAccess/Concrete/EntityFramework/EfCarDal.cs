@@ -19,6 +19,9 @@ namespace DataAccess.Concrete.EntityFramework
                 var addEntity = context.Entry(entity);
                 addEntity.State = EntityState.Added;
                 context.SaveChanges();
+
+                //context.Cars.Add(entity); context.SaveChanges();
+                //ekleme komutunda üsteki komut da kullanılabilir
             }
         }
 
@@ -55,8 +58,17 @@ namespace DataAccess.Concrete.EntityFramework
         {
             using (ReCapProjectContext context = new ReCapProjectContext())
             {
-                var updateEntity = context.Entry(entity);
-                updateEntity.State = EntityState.Modified;
+                //var updateEntity = context.Entry(entity);
+                //updateEntity.State = EntityState.Modified;
+                //context.SaveChanges();
+
+                var productToUpdate = context.Cars.SingleOrDefault(p=>p.Id==entity.Id);
+                productToUpdate.Id = entity.Id;
+                productToUpdate.BrandId = entity.BrandId;
+                productToUpdate.ColorId = entity.ColorId;
+                productToUpdate.DailyPrice = entity.DailyPrice;
+                productToUpdate.Description = entity.Description;
+                productToUpdate.ModelYear = entity.ModelYear;
                 context.SaveChanges();
             }
         }
