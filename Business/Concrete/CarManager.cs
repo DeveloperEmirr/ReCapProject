@@ -1,4 +1,6 @@
 ﻿using Business.Abstract;
+using Business.Constants;
+using Core.Utilities.Result;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.Dto;
@@ -18,61 +20,70 @@ namespace Business.Concrete
             _cardal = cardal;
         }
 
-        public void Add(Car car)
+        public IResult Add(Car car)
         {
-            if (car.Description.Length<2 || car.DailyPrice<0)
+            if (car.Description.Length>2)
             {
-                Console.WriteLine("Araç İsmi minimum 2 karakter, araç günlük fiyatı geçerli rakam olmalıdır!");
+                return new ErrorResult(Messages.CarNameInvalid);
             }
-            else
-            {
                 _cardal.Add(car);
-                Console.WriteLine("Araç Başarı İle Eklendi...");
-
-            }
+                return new SuccesResult(Messages.CarAdded);
         }
 
-        public void Delete(Car car)
+        public IResult Delete(Car car)
         {
             if (car.Id != 0)
             {
+
                 _cardal.Delete(car);
+                return new SuccesResult(Messages.CarDeleted);
             }
             else
             {
-                Console.WriteLine("Araç İd Boş Girilemez!");
+                return new ErrorResult(Messages.CarDeletedInvalid);
             }
         }
 
-        public void Update(Car car)
+        public IResult Update(Car car)
         {
             if (car.Description.Length < 2)
             {
-                Console.WriteLine("Araç İsmi minimum 2 karakter, araç günlük fiyatı geçerli rakam olmalıdır!");
+                return new ErrorResult(Messages.CarNameInvalid);
             }
             else
             {
                 _cardal.Update(car);
+                return new SuccesResult(Messages.CarUptades);
             }
         }
-        public List<Car> GetAll()
+        public IDataResult<List<Car>> GetAll()
         {
-            return _cardal.GetAll();
+            if (DateTime.Now.Hour==15)
+            {
+                return new ErrorDataResult<List<Car>>(Messages.MaintenanceTime);
+            }
+            
+            return new SuccesDataResult<List<Car>>(_cardal.GetAll(), Messages.CarListed);
         }
 
-        public List<Car> GetCarsByBranID(int id)
+        public IDataResult<List<Car>> GetCarsByBranID(int id)
         {
-            return _cardal.GetAll(p=>p.Id==id);
+            return new SuccesDataResult<List<Car>>(_cardal.GetAll(p=>p.Id==id));
         }
 
-        public List<Car> GetCarsByColorId(int id)
+        public IDataResult<List<Car>> GetCarsByColorId(int id)
         {
-            return _cardal.GetAll(p=>p.ColorId==id);
+            return new SuccesDataResult<List<Car>>(_cardal.GetAll(p=>p.ColorId==id));
         }
 
-        public List<CarDetail> GetCarDetails()
+        public IDataResult<List<CarDetail>> GetCarDetails()
         {
-            return _cardal.GetCarDetails();
+            if (DateTime.Now.Hour == 14)
+            {
+                return new ErrorDataResult<List<CarDetail>>(Messages.MaintenanceTime);
+            }
+
+            return new SuccesDataResult<List<CarDetail>>(_cardal.GetCarDetails(),Messages.CarListed);
         }
     }
 }
