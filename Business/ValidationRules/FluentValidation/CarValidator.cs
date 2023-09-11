@@ -17,12 +17,7 @@ namespace Business.ValidationRules.FluentValidation
             RuleFor(c => c.DailyPrice).GreaterThan(0);
             RuleFor(c => c.BrandId).NotEmpty();
             RuleFor(c => c.ModelYear).NotEmpty();
-            RuleFor(c => c.Description).Must(StartWithF).WithMessage("Araç İsmi 'F' Harfi İle Başlamalıdır.");
         }
 
-        private bool StartWithF(string arg)
-        {
-            return arg.StartsWith("F");
-        }
     }
 }
