@@ -1,3 +1,6 @@
+using Core.DependencyResolvers;
+using Core.Extentions;
+using Core.Utilities.IoC;
 using Core.Utilities.Security.Encrytion;
 using Core.Utilities.Security.JWT;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,6 +48,11 @@ namespace WebAPI
                     };
                 });
 
+
+            services.AddDependencyResolvers(new ICoreModule[]
+                {
+                    new CoreModule()
+                });
 
             services.AddSwaggerGen(c =>
             {

@@ -1,6 +1,10 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Result;
 using DataAccess.Abstract;
@@ -22,6 +26,8 @@ namespace Business.Concrete
             _cardal = cardal;
         }
 
+        [SecuredOperation("product.add,admin")]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Car car)
         {
             ValidationTool.Validate(new CarValidator(),car);
@@ -42,7 +48,7 @@ namespace Business.Concrete
                 return new ErrorResult(Messages.CarDeletedInvalid);
             }
         }
-
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Update(Car car)
         {
             if (car.Description.Length < 2)
@@ -55,6 +61,7 @@ namespace Business.Concrete
                 return new SuccesResult(Messages.CarUptades);
             }
         }
+        [PerformanceAspect(5)]
         public IDataResult<List<Car>> GetAll()
         {
             if (DateTime.Now.Hour==23)
@@ -83,6 +90,14 @@ namespace Business.Concrete
             }
 
             return new SuccesDataResult<List<CarDetail>>(_cardal.GetCarDetails(),Messages.CarListed);
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Car car)
+        {
+            _cardal.Update(car);
+            _cardal.Add(car);
+            return new SuccesResult("Ürün Gönderildi");
         }
     }
 }
